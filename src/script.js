@@ -1,21 +1,21 @@
 import './style.css'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import * as dat from 'dat.gui'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
+
 
 /**
  * Base
  */
-// Debug
-const gui = new dat.GUI()
 
 // Canvas
 const canvas = document.querySelector('canvas.webgl')
 
 // Scene
 const scene = new THREE.Scene()
+scene.background = new THREE.Color( 0xfbfbf8 );
+
 
 /**
  * Models
@@ -29,33 +29,25 @@ gltfLoader.setDRACOLoader(dracoLoader)
 let mixer = null
 
 gltfLoader.load(
-    '/models/Fox/glTF/Fox.gltf',
+    '/models/Fox/sun/scene.gltf',
     (gltf) =>
     {
-        gltf.scene.scale.set(0.025, 0.025, 0.025)
+        gltf.scene.scale.set(0.0035, 0.0035, 0.0035)
+        gltf.scene.rotation.y = -0.5 * Math.PI;
+         gltf.scene.position.set(0.8,0,0)
         scene.add(gltf.scene)
+
+        console.log(gltf.scene.children)
 
         // Animation
         mixer = new THREE.AnimationMixer(gltf.scene)
         const action = mixer.clipAction(gltf.animations[2])
+        action.setLoop( THREE.LoopOnce )
         action.play()
     }
 )
 
-/**
- * Floor
- */
-const floor = new THREE.Mesh(
-    new THREE.PlaneGeometry(10, 10),
-    new THREE.MeshStandardMaterial({
-        color: '#444444',
-        metalness: 0,
-        roughness: 0.5
-    })
-)
-floor.receiveShadow = true
-floor.rotation.x = - Math.PI * 0.5
-scene.add(floor)
+
 
 /**
  * Lights
@@ -82,6 +74,8 @@ const sizes = {
     height: window.innerHeight
 }
 
+
+
 window.addEventListener('resize', () =>
 {
     // Update sizes
@@ -97,18 +91,39 @@ window.addEventListener('resize', () =>
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 })
 
+// scene.children[1].children[1]
+
 /**
  * Camera
  */
 // Base camera
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
-camera.position.set(2, 2, 2)
+camera.position.set(0, 0, 5)
+//add flo
+camera.lookAt(scene.children[1].position)
 scene.add(camera)
 
 // Controls
 const controls = new OrbitControls(camera, canvas)
 controls.target.set(0, 0.75, 0)
 controls.enableDamping = true
+
+
+// Cursor
+const cursor = {
+    x: 0,
+    y: 0
+}
+
+window.addEventListener('mousemove', (event) =>
+{
+    cursor.x = event.clientX / sizes.width - 0.5
+    cursor.y = event.clientY / sizes.height - 0.5
+
+    // console.log(cursor.x, cursor.y)
+})
+
+
 
 /**
  * Renderer
@@ -140,7 +155,17 @@ const tick = () =>
     }
 
     // Update controls
-    controls.update()
+    // controls.update()
+
+    // var mouseX = 0, mouseY = 0;
+    // var windowHalfX = window.innerWidth / 2;
+    // var windowHalfY = window.innerHeight / 2
+
+     // Update camera
+     
+     camera.position.x = cursor.x * 1
+     camera.position.y = cursor.y * 1
+    //  camera.lookAt(scene.position)
 
     // Render
     renderer.render(scene, camera)
