@@ -14,7 +14,7 @@ const canvas = document.querySelector('canvas.webgl')
 
 // Scene
 const scene = new THREE.Scene()
-scene.background = new THREE.Color( 0xfbfbf8 );
+scene.background = new THREE.Color( 0xffffff );
 
 
 /**
@@ -97,6 +97,8 @@ window.addEventListener('resize', () =>
  * Camera
  */
 // Base camera
+
+
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
 camera.position.set(0, 0, 5)
 //add flo
@@ -165,6 +167,8 @@ const tick = () =>
      
      camera.position.x = cursor.x * 1
      camera.position.y = cursor.y * 1
+  
+     
     //  camera.lookAt(scene.position)
 
     // Render
